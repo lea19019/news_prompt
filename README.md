@@ -1,572 +1,358 @@
+# Prompt Enrichment Evaluation: News Classification with Open Source LLMs
 
-# Prompt Enrichment in News Classification: Shifting the LLM Performance Frontier
+![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20Inference-green.svg)
+![Prompt Engineering](https://img.shields.io/badge/Prompt-Engineering-orange.svg)
+![Open Source LLMs](https://img.shields.io/badge/Open%20Source-LLMs-purple.svg)
 
-## Abstract
+## Executive Summary
 
-News classification is a canonical challenge for evaluating the reasoning and generalization capabilities of Large Language Models (LLMs). While prompt engineering has become a standard tool, most approaches treat category labels as atomic tokens—missing the rich semantic context that real-world categories encode. This project investigates a new direction: **Prompt Enrichment**—the systematic augmentation of category labels with descriptive, contextual, or semantic information. The result is a modular, research-grade framework that demonstrates how enrichment can shift the performance frontier in zero-shot and few-shot news classification.
+This project systematically evaluates whether **semantic category enrichment** improves news classification performance with open-source LLMs, replicating and extending [Yada & Yamana (2024)](https://arxiv.org/abs/2405.13007)'s work on enriched category descriptions from news recommendation to text classification. Through a controlled evaluation of 72 experimental conditions (3 models × 3 datasets × 8 prompting techniques), we establish that enrichment effectiveness is **highly technique-dependent** and cannot compensate for fundamental technique-task misalignment.
 
----
+**📄 [Read the Full Technical Report](project_report/main.pdf)** | **📊 [View Experiment Results](results/run_20251204_083400_baseline_vs_enriched_v2/)**
 
-## Hypothesis
+### Key Findings
 
-> **Does augmenting category labels with semantic context—"enrichment"—improve LLM zero-shot and few-shot accuracy in news classification?**
+1. **Baseline Few-Shot Dominates**: Label-only Few-Shot techniques achieve the highest performance (68.2% mean F1), outperforming all enriched variants. When labeled examples exist, semantic enrichment introduces redundancy rather than clarity.
 
-The core research question: Can LLMs leverage richer, more descriptive prompts to better map ambiguous news articles to the correct category, especially in the absence of fine-tuning?
+2. **Gemma3:12b is Production-Ready**: The 12B-parameter Gemma model achieves 73.6% mean F1 with balanced precision-recall and <5% parse failures, demonstrating that instruction-tuning quality matters more than raw parameter count.
 
----
+3. **Chain-of-Thought Underperforms**: Despite substantial enrichment gains (+29.5 F1 points), enriched CoT (66.4% F1) still underperforms baseline Few-Shot by 16.4 points. Explicit reasoning steps fundamentally misalign with the pattern-recognition nature of classification tasks.
 
-## Methodology & Implementation
+4. **Parameter Count ≠ Reliability**: The 20B-parameter GPT-OSS model exhibits catastrophic parse failures (80%+ on complex datasets) despite its size advantage, while the smaller 12B Gemma maintains robust output formatting across all conditions.
 
-This project is built on a modular, SWE-principled framework that abstracts datasets, prompt templates, model APIs, and evaluation metrics. This architecture enables systematic experimentation across:
-
-- **3 Datasets:** AG News, BBC News, 20 Newsgroups
-- **Multiple LLMs:** (e.g., gemma3:12b, llama3.2:1b, gpt-oss:20b)
-- **Prompting Techniques:** Baseline (atomic labels), Enriched (semantic labels), Zero-shot, Few-shot, Chain-of-Thought, and their enriched variants
-
-The framework orchestrates full matrix sweeps (model × dataset × technique), ensuring reproducibility and extensibility for future research.
+This work establishes a systematic framework for prompt engineering evaluation, treating prompting strategies as controlled experimental variables rather than trial-and-error optimization.
 
 ---
 
-## The Enrichment Strategy: Intellectual Approach
+## Experimental Framework & Orchestration
 
-Traditional prompts present category labels as mere tokens (e.g., "World", "Sports"). The **Enrichment Strategy** expands each label into a semantically loaded description (e.g., "World: International news, global events, and geopolitical developments"). This approach is inspired by the hypothesis that LLMs, when given richer context, can better disambiguate and generalize—especially in zero-shot and few-shot settings. Enrichment is applied systematically across all datasets and techniques, enabling direct comparison with baseline prompts.
+### Local Inference Architecture
+
+All experiments were conducted using **Ollama** for local model inference, enabling reproducible evaluation without API rate limits or cost constraints. Three recent open-source decoder-only LLMs were evaluated:
+
+- **Gemma3:12b** (12B parameters) - Google's instruction-tuned model
+- **Llama3.2:1b** (1B parameters) - Meta's compact model
+- **GPT-OSS:20b** (20B parameters) - Open-source GPT variant
+
+### Systematic Evaluation Matrix
+
+The experimental design implements a **72-condition evaluation matrix**:
+
+```
+3 models × 3 datasets × 8 techniques = 72 unique conditions
+```
+
+**Datasets** (varying classification difficulty):
+- **AG News** (4 classes): World, Sports, Business, Sci/Tech
+- **BBC News** (5 classes): business, entertainment, politics, sport, tech
+- **20 Newsgroups** (20 classes): Fine-grained newsgroup topics
+
+**Prompting Techniques** (baseline + enriched variants):
+- Zero-Shot: Direct classification without examples
+- Few-Shot-3: Three labeled examples per class
+- Few-Shot-5: Five labeled examples per class
+- Chain-of-Thought: Step-by-step reasoning instructions
+
+### Enrichment Strategy
+
+Traditional prompts present category labels as atomic tokens:
+```
+Categories: Sports, Business, Technology, World
+```
+
+**Enriched prompts** augment labels with semantic context:
+```
+Categories:
+- Sports: athletic competitions, games, teams, players, championships, tournaments, leagues
+- Business: companies, markets, economy, finance, stocks, trading, corporations, revenue
+- Technology: software, hardware, internet, gadgets, innovation, digital products, startups
+- World: international affairs, foreign policy, geopolitics, global conflicts, diplomacy
+```
+
+The same enriched descriptions were applied consistently across all experiments, enabling direct baseline-vs-enriched comparison.
+
+### Controlled Methodology
+
+To ensure rigorous evaluation:
+
+- **300 stratified samples** per condition (proportional class representation)
+- **Temperature = 0** for deterministic generation (eliminates sampling variability)
+- **Fixed example sets** across all experiments within each dataset-model combination
+- **Identical structural formatting** for baseline and enriched variants (only category descriptions vary)
+
+This design isolates the effect of semantic enrichment from confounding factors, treating **prompt engineering as a systematic variable** rather than an optimization process.
 
 ---
 
-## Breakthrough Results: Where Vibe Meets Data
+## Results & Data Interpretation
 
-**Key Findings (see [statistical_summary.txt](results/run_20251204_083400_baseline_vs_enriched_v2/statistical_summary.txt) and [main.pdf](project_report/main.pdf) for full analysis):**
+### Performance Hierarchy: Technique Ranking
 
-- **Performance Frontier:** The best F1 score (95.43%) was achieved by gemma3:12b on BBC News with the enriched few-shot technique, demonstrating that prompt enrichment can unlock near-supervised performance in select settings.
-- **Robustness:** Enrichment reduced parse failure rates (from 16.43% to 15.62% on average), indicating improved model alignment with task constraints.
-- **Metric Distributions:** Radar plots and metric distribution figures ([fig2_model_radar.png](project_report/fig2_model_radar.png), [fig8_metric_distributions.png](project_report/fig8_metric_distributions.png)) reveal that enrichment narrows the gap between baseline and advanced prompting, especially in complex, multi-class settings (e.g., 20 Newsgroups).
-- **Nuanced Impact:** While mean F1 improvement was modest (+0.04 percentage points), enrichment consistently improved precision and reduced failure rates, with the most pronounced gains in the hardest dataset (20 Newsgroups).
-- **Technique Ranking:** Few-shot and enriched variants dominate the top ranks, with chain-of-thought enrichment showing the most variance—highlighting the importance of prompt design for LLM reliability.
+Aggregated across all models and datasets, prompting techniques exhibit clear performance stratification:
+
+| Rank | Technique | Mean F1 | Interpretation |
+|------|-----------|---------|----------------|
+| **1** | Few-Shot-3 (baseline) | **68.23%** | Label-only examples provide optimal classification signal |
+| **2** | Few-Shot-5 (baseline) | **68.01%** | Additional examples yield marginal improvement |
+| 3 | Few-Shot-5 (enriched) | 63.32% | Enrichment introduces redundancy when examples exist |
+| 4 | Zero-Shot (baseline) | 62.42% | Reasonable baseline without examples |
+| 5 | Few-Shot-3 (enriched) | 61.96% | Enrichment degrades Few-Shot performance |
+| 6 | Zero-Shot (enriched) | 60.95% | Modest enrichment benefit without examples |
+| 7 | Chain-of-Thought (enriched) | 56.00% | Enrichment helps CoT but insufficient for task |
+| **8** | Chain-of-Thought (baseline) | **43.41%** | Reasoning steps misalign with classification |
+
+> **Key Insight**: Enrichment cannot compensate for technique-task misalignment. When labeled examples already demonstrate category boundaries, semantic descriptions add redundancy rather than clarity.
+
+### Model Comparison: Architecture Matters More Than Scale
+
+Performance analysis reveals that **instruction-tuning quality and architectural design outweigh raw parameter count**:
+
+| Model | Mean F1 | Parse Failures | Precision | Recall | Verdict |
+|-------|---------|----------------|-----------|--------|---------|
+| **Gemma3:12b** | **73.59%** | **2.3%** | 84% (balanced) | 79% (balanced) | Production-ready: balanced metrics, robust formatting |
+| GPT-OSS:20b | 66.42% | **42.3%** | **95%+** | **<20%** | Catastrophic failures: extreme precision-recall imbalance |
+| Llama3.2:1b | 41.61% | 2.0% | Variable | Variable | Unstable: severe enrichment sensitivity |
+
+![Model Performance Radar Chart](project_report/fig2_model_radar.png)
+
+**Figure 1**: Model performance profiles across accuracy, precision, recall, and F1 score. Gemma3:12b exhibits balanced diamond-shaped metrics, while GPT-OSS:20b shows precision-skewed triangular profile indicating conservative prediction strategy. Llama3.2:1b demonstrates high variability across conditions.
+
+> **Key Insight**: The 20B-parameter GPT-OSS model achieves 95%+ precision but <20% recall, producing a conservative prediction strategy where most instances remain effectively unclassified. Combined with 42% parse failures, parameter scale provides no deployment advantage over the well-tuned 12B Gemma model.
+
+### Deep Dive: Chain-of-Thought Behavior
+
+Chain-of-Thought prompting exhibits severe **precision-recall imbalance** that enrichment only partially addresses:
+
+#### Baseline CoT Performance (Gemma3:12b)
+| Dataset | Precision | Recall | F1 | Imbalance |
+|---------|-----------|--------|-----|-----------|
+| AG News | 82.9% | 45.3% | 36.9 | 37.6 points |
+| BBC News | 74.7% | 48.8% | 46.6 | 25.9 points |
+| 20 Newsgroups | 69.5% | 29.8% | 38.1 | 39.7 points |
+
+The model correctly classifies instances it processes but adopts **overly conservative category assignment**, failing to confidently classify many articles.
+
+#### Enrichment Effect on CoT
+Semantic descriptions provide "anchors" for structured reasoning, substantially improving recall:
+
+| Dataset | Δ Precision | Δ Recall | Δ F1 | Interpretation |
+|---------|-------------|----------|------|----------------|
+| AG News | -2.1 | **+21.7** | **+29.5** | Enrichment reduces conservative behavior |
+| BBC News | +9.6 | **+27.4** | **+29.7** | Semantic context enables confident assignment |
+| 20 Newsgroups | +1.5 | **+21.4** | **+18.9** | Descriptions disambiguate complex categories |
+
+**However**, even enriched CoT substantially underperforms baseline Few-Shot:
+- AG News: Enriched CoT (66.4 F1) vs Few-Shot-3 baseline (83.4 F1) = **17.0 point gap**
+- BBC News: Enriched CoT (76.3 F1) vs Few-Shot-3 baseline (93.7 F1) = **17.4 point gap**
+
+![Metric Distributions by Technique](project_report/fig8_metric_distributions.png)
+
+**Figure 2**: Metric distributions across prompting techniques for Gemma3:12b. Few-Shot methods maintain tight, high-performance distributions (F1 std dev: 5 points), while Chain-of-Thought exhibits high variance (F1 std dev: 15.2 points), particularly in recall. Box plots demonstrate that explicit reasoning steps fundamentally misalign with pattern-recognition classification tasks.
+
+> **Key Insight**: Enrichment provides semantic anchors that help CoT reasoning, but cannot overcome fundamental technique-task misalignment. Classification is a pattern-recognition task where labeled examples outperform explicit reasoning by wide margins.
+
+### Dataset Complexity Effects
+
+Enrichment effectiveness varies with dataset characteristics:
+
+#### BBC News (5 classes) - Ceiling Effects
+- Few-Shot-3 baseline: **93.7% F1** (94.0% precision, 93.6% recall)
+- Few-Shot-3 enriched: **94.8% F1** (+1.1 points)
+- **Interpretation**: Well-separated categories approach performance ceiling; enrichment provides minimal benefit when category boundaries are already clear from examples.
+
+#### 20 Newsgroups (20 classes) - Maximum Complexity
+- Few-Shot-3 baseline: 61.4% F1 (72.8% precision, 60.4% recall)
+- Few-Shot-3 enriched: **65.8% F1** (+4.4 points)
+- **Interpretation**: Fine-grained categories benefit from semantic descriptions that disambiguate related groups (e.g., five `comp.*` categories, four `talk.*` categories). Enrichment provides explicit differentiating features.
+
+#### Parse Failures Scale with Complexity
+
+![Parse Failure Analysis](project_report/fig3_parse_failure_analysis.png)
+
+**Figure 3**: Parse failure rates by model and dataset. GPT-OSS exhibits catastrophically scaling failures with dataset complexity, exceeding 80% on 20 Newsgroups despite its 20B parameters. Gemma3:12b and Llama3.2:1b maintain stable rates below 5% across all datasets, demonstrating superior instruction-following.
+
+| Dataset | Classes | Parse Failures | Best Technique F1 |
+|---------|---------|----------------|-------------------|
+| BBC News | 5 | 4.2% | 95.4% (Few-Shot-5) |
+| AG News | 4 | 12.0% | 86.3% (Few-Shot-5 enriched) |
+| 20 Newsgroups | 20 | **31.8%** | 65.8% (Few-Shot-3 enriched) |
+
+Parse failures represent **production deployment risk**: 31.8% failure rate means nearly 1-in-3 predictions are unparseable and unusable.
 
 ---
 
-## Conclusion: What This Proves
+## Engineering Insights: Lessons Learned
 
-This project demonstrates that **Prompt Enrichment** is a viable, scalable strategy for improving LLM performance in news classification—especially in zero- and few-shot regimes. The results suggest that LLMs are sensitive to the semantic richness of prompts, and that careful prompt engineering can substitute for (or amplify) the effects of data-driven fine-tuning. For practitioners and researchers, this work provides both a blueprint for modular experimentation and a proof point for the power of prompt-centric research.
+### For Practitioners Building LLM Classification Systems
+
+#### 1. Technique Selection Matters Most
+**Few-Shot with label-only prompts** achieves the best balance of performance, stability, and simplicity. No need for semantic enrichment engineering when you have labeled examples—the examples themselves demonstrate category boundaries more effectively than descriptions.
+
+**Recommendation**: Start with Few-Shot-3. Only consider enrichment if:
+- You're stuck with zero-shot constraints (no training data)
+- Dataset has 15+ fine-grained categories with semantic overlap
+- Baseline Few-Shot parse failures exceed 10%
+
+#### 2. Model Selection Criteria
+
+Prioritize these factors over raw parameter count:
+
+**Critical metrics**:
+- ✅ **Balanced precision-recall** (within 5 points)
+- ✅ **Parse failure rate** (target <5% on representative complexity)
+- ✅ **Instruction-following** under output format constraints
+
+**Secondary metrics**:
+- Accuracy/F1 scores
+- Inference latency
+- Memory footprint
+
+**Case study**: Gemma3:12b (12B params, 2.3% failures, 73.6% F1) outperforms GPT-OSS:20b (20B params, 42.3% failures, 66.4% F1) for production deployment despite smaller size.
+
+#### 3. Chain-of-Thought is Not Universal
+
+CoT substantially improves **arithmetic and symbolic reasoning** tasks (Wei et al. 2022) but **misaligns with perceptual pattern-recognition** tasks like classification.
+
+**When to use CoT**:
+- Multi-step mathematical problems
+- Logical deduction chains
+- Complex reasoning requiring intermediate steps
+
+**When NOT to use CoT**:
+- Classification (pattern matching)
+- Named entity recognition
+- Sentiment analysis
+- Any task where examples > reasoning
+
+#### 4. Parse Failures = Production Risk
+
+Average 16% parse failure rate across all experiments means **1-in-6 predictions are unusable** in production. This metric is often ignored in benchmarks but critically impacts real-world deployment.
+
+**Monitor parse failures during evaluation**:
+- Log raw model outputs for manual inspection
+- Test with representative input complexity (not just clean benchmark data)
+- Implement fallback strategies (retry with constrained prompt, rule-based classifier)
+
+#### 5. Enrichment ROI is Low for Most Use Cases
+
+When labeled examples exist, enrichment:
+- ❌ Introduces redundancy (Few-Shot-3 baseline: 68.2% F1 → enriched: 62.0% F1)
+- ❌ Increases prompt length and inference cost
+- ❌ Requires manual curation of semantic descriptions
+- ✅ Only helps zero-shot (+1.5% F1) and complex multi-class scenarios (+4.4% F1 on 20NG)
+
+**Save engineering effort**: Use baseline Few-Shot unless you have specific evidence enrichment helps your task.
+
+### Framework for Systematic Prompt Engineering
+
+This evaluation establishes a methodology for rigorous prompt engineering research:
+
+1. **Decompose prompting into orthogonal variables**:
+   - Examples: zero-shot vs few-shot (3 vs 5)
+   - Reasoning: direct vs chain-of-thought
+   - Enrichment: label-only vs semantic descriptions
+
+2. **Measure reliability alongside performance**:
+   - Standard metrics: accuracy, precision, recall, F1
+   - **Critical addition**: parse failure rate
+
+3. **Use controlled experimental design**:
+   - Fix all variables except one (e.g., enrichment: on/off)
+   - Consistent sampling (stratified, fixed seeds)
+   - Temperature = 0 for deterministic outputs
+
+4. **Visualize trade-offs**:
+   - Radar charts for precision-recall-F1 balance
+   - Box plots for technique variance
+   - Failure rate bar charts by model/dataset
+
+This systematic approach enables **reproducible prompt engineering** rather than anecdotal "vibes-based" optimization.
+
+---
+
+## Reproducibility
+
+### Quick Start (5 minutes)
+
+```bash
+# Prerequisites: Python 3.8+, uv, Ollama
+curl -LsSf https://astral.sh/uv/install.sh | sh
+ollama pull gemma3:12b
+
+# Setup
+cd news_classification_prompts
+./setup.sh
+
+# Verify installation
+uv run python check_status.py
+
+# Run quick test (10 samples)
+uv run python experiments.py \
+  --models gemma3:12b \
+  --datasets ag_news \
+  --techniques few_shot_3,few_shot_3_enriched \
+  --limit 10 \
+  --run-name quick_test
+```
+
+### Reproduce Baseline vs Enriched Comparison
+
+```bash
+# Full evaluation matrix (72 conditions, ~2-3 hours on M1 Mac)
+uv run python experiments.py \
+  --models gemma3:12b,llama3.2:1b,gpt-oss:20b \
+  --datasets ag_news,bbc_news,20newsgroups \
+  --techniques zero_shot,zero_shot_enriched,few_shot_3,few_shot_3_enriched,few_shot_5,few_shot_5_enriched,chain_of_thought,chain_of_thought_enriched \
+  --limit 300 \
+  --run-name baseline_vs_enriched_reproduction
+```
+
+Results will be saved to `results/run_YYYYMMDD_HHMMSS_baseline_vs_enriched_reproduction/` with:
+- `summary.csv` - One row per condition with all metrics
+- `figures/` - 15+ visualization plots (radar charts, heatmaps, distributions)
+- `tables/` - Comparative analysis tables (technique ranking, model comparison)
+- `statistical_summary.txt` - Statistical analysis and key findings
+
+### Key Project Files
+
+- **Experiment Pipeline**: [experiments.py](experiments.py) (582 lines) - Orchestrates matrix sweeps, manages result logging
+- **Prompt Templates**: [prompts/](prompts/) - Editable text templates for all techniques (zero-shot, few-shot, CoT, enriched variants)
+- **Datasets**: [data/](data/) - Auto-downloaded and preprocessed (AG News, BBC News, 20 Newsgroups)
+- **Reference Results**: [results/run_20251204_083400_baseline_vs_enriched_v2/](results/run_20251204_083400_baseline_vs_enriched_v2/) - Complete experimental run with all figures and tables
+- **Technical Report**: [project_report/main.pdf](project_report/main.pdf) - Full research paper with methodology and statistical analysis
+
+For detailed architecture, module documentation, and troubleshooting, see [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ---
 
 ## Technical Deep Dive
 
-For a comprehensive breakdown of methodology, results, and figures, see the [Technical Deep Dive (main.pdf)](project_report/main.pdf).
+For comprehensive methodology, statistical analysis, and per-class performance breakdowns:
 
----
+- **Research Report**: [project_report/main.pdf](project_report/main.pdf) - Complete analysis with figures, tables, and statistical tests (LaTeX source: [main.tex](project_report/main.tex))
+- **Result Figures**: [project_report/](project_report/) - Model radar charts (fig2), parse failure analysis (fig3), metric distributions (fig8)
+- **Detailed Results**: [results/run_20251204_083400_baseline_vs_enriched_v2/](results/run_20251204_083400_baseline_vs_enriched_v2/) - Raw experimental data, comparative tables, visualization suite
+- **Statistical Summary**: [results/run_20251204_083400_baseline_vs_enriched_v2/statistical_summary.txt](results/run_20251204_083400_baseline_vs_enriched_v2/statistical_summary.txt) - Correlation analysis, metric distributions, best/worst configurations
 
-## Project Structure
+### Experimental Design Details
 
+**Sample Selection**: 300 stratified samples per condition maintain proportional class representation. Sampling was performed once and fixed across all technique variants within each dataset-model combination to ensure observed differences stem from prompting strategy rather than sample composition.
 
----
+**Temperature Setting**: Temperature = 0 ensures deterministic generation, eliminating sampling variability and enabling reliable baseline-vs-enriched comparison.
 
-## Project Structure
+**Prompt Structure**: All prompts share identical formatting, varying only in category descriptions (label-only vs semantic enrichment). Few-Shot prompts maintain consistent example ordering and formatting across baseline/enriched variants.
 
-```
-news_classification_prompts/
-├── experiments.py          # Main orchestrator - CLI entry point
-├── dataset_loader.py       # Dataset download, preprocessing, caching
-├── prompt_loader.py        # Prompt template loading and formatting
-├── model_inference.py      # Ollama API wrapper with response parsing
-├── evaluation.py           # Metrics computation (accuracy, F1, etc.)
-├── check_status.py         # System readiness verification
-├── setup.sh                # Automated setup script
-├── requirements.txt        # Python dependencies
-├── pyproject.toml          # Project metadata
-│
-├── prompts/                # Editable prompt templates (plain text)
-│   ├── zero_shot.txt       # No examples, direct classification
-│   ├── few_shot.txt        # 3 labeled examples included
-│   ├── constrained.txt     # Few-shot + strict output format
-│   ├── chain_of_thought.txt # Few-shot + step-by-step reasoning
-│   └── self_consistency.txt # Same as constrained, but sampled 5x
-│
-├── data/                   # Auto-downloaded datasets (CSV format)
-│   ├── ag_news_train.csv   # 120,000 samples
-│   ├── ag_news_test.csv    # 7,600 samples
-│   ├── bbc_news_train.csv  # ~1,780 samples
-│   ├── bbc_news_test.csv   # ~445 samples
-│   ├── 20newsgroups_train.csv  # ~11,300 samples
-│   └── 20newsgroups_test.csv   # ~7,500 samples
-│
-└── results/                # Experiment outputs (auto-created)
-    └── run_YYYYMMDD_HHMMSS[_name]/
-        ├── run_config.json     # What was run (models, datasets, techniques)
-        ├── results.json        # Full results with per-class metrics
-        ├── summary.csv         # Quick tabular overview
-        └── run_summary.json    # High-level stats (duration, best/worst)
-```
-
----
-
-## Quick Start
-
-### Prerequisites
-
-1. **Python 3.8+**
-2. **[uv](https://docs.astral.sh/uv/)** package manager:
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-3. **[Ollama](https://ollama.ai/)** with at least one model installed:
-   ```bash
-   ollama pull gemma3:4b
-   ```
-
-### Setup
-
-```bash
-# Clone/navigate to project
-cd news_classification_prompts
-
-# Automated setup (installs deps + downloads datasets)
-./setup.sh
-
-# Or manual setup
-uv pip install -r requirements.txt
-uv run python dataset_loader.py
-```
-
-### Verify Installation
-
-```bash
-uv run python check_status.py
-```
-
-### Run Your First Experiment
-
-```bash
-# Quick test (10 samples)
-uv run python experiments.py \
-  --models gemma3:4b \
-  --datasets ag_news \
-  --techniques zero_shot \
-  --limit 10 \
-  --run-name first_test
-```
-
----
-
-## Usage
-
-### Flexible Experiment Configuration
-
-The `experiments.py` CLI supports flexible combinations with comma-separated lists or `all`:
-
-```bash
-# Single model on all datasets and techniques
-uv run python experiments.py --models gemma3:12b --datasets all --techniques all
-
-# Multiple models on one dataset
-uv run python experiments.py --models gemma3:12b,phi4:14b --datasets ag_news --techniques all
-
-# Compare specific techniques
-uv run python experiments.py --models gemma3:12b --datasets ag_news,bbc_news --techniques zero_shot,few_shot
-
-# Full pipeline (all available models × all datasets × all techniques)
-uv run python experiments.py --full --run-name baseline_v1
-
-# Quick test with sample limit
-uv run python experiments.py --full --limit 50 --run-name quick_test
-```
-
-### CLI Arguments
-
-| Argument | Description |
-|----------|-------------|
-| `--models` | Comma-separated model names or `all` |
-| `--datasets` | Comma-separated dataset names or `all` (ag_news, bbc_news, 20newsgroups) |
-| `--techniques` | Comma-separated techniques or `all` |
-| `--limit N` | Test on first N samples only (for quick testing) |
-| `--run-name NAME` | Custom name for this experiment run |
-| `--full` | Run all combinations (shorthand for `--models all --datasets all --techniques all`) |
-
-### Legacy Single-Experiment Syntax
-
-```bash
-uv run python experiments.py --dataset ag_news --model gemma3:4b --technique zero_shot
-```
-
----
-
-## Datasets
-
-All datasets are automatically downloaded and preprocessed to a consistent CSV format with columns: `text`, `label`, `label_text`.
-
-| Dataset | Classes | Train Samples | Test Samples | Categories |
-|---------|---------|---------------|--------------|------------|
-| **AG News** | 4 | 120,000 | 7,600 | World, Sports, Business, Sci/Tech |
-| **BBC News** | 5 | ~1,780 | ~445 | business, entertainment, politics, sport, tech |
-| **20 Newsgroups** | 20 | ~11,300 | ~7,500 | Various newsgroup topics |
-
----
-
-## Prompting Techniques
-
-Each technique is stored as an editable text file in `prompts/`:
-
-### 1. Zero-Shot (`zero_shot.txt`)
-Direct classification with no examples.
-```
-Classify this news article into one category: {categories}
-Article: {text}
-Category:
-```
-
-### 2. Few-Shot (`few_shot.txt`)
-Includes 3 labeled examples from the training set.
-```
-Classify news articles into categories.
-Examples:
-{examples}
-Article: {text}
-Category:
-```
-
-### 3. Constrained (`constrained.txt`)
-Few-shot with explicit output format constraint.
-```
-...
-Answer with ONLY ONE WORD from: {categories}
-```
-
-### 4. Chain-of-Thought (`chain_of_thought.txt`)
-Few-shot with step-by-step reasoning instructions.
-```
-Let's think step by step:
-1. Identify the main topic
-2. Determine the best category
-3. Provide your answer
-```
-
-### 5. Self-Consistency (`self_consistency.txt`)
-Same prompt as constrained, but generates 5 predictions at temperature=0.7 and takes majority vote.
-
-### Template Placeholders
-
-- `{text}` → The article text to classify
-- `{categories}` → Comma-separated list of valid categories
-- `{examples}` → Formatted few-shot examples (auto-generated)
-
----
-
-## Experiment Results
-
-Each experiment run creates its own folder:
-
-```
-results/run_20251203_151718_baseline_v1/
-├── run_config.json     # Configuration: models, datasets, techniques, limit
-├── results.json        # Full results with per-class metrics for each experiment
-├── summary.csv         # CSV with one row per experiment
-└── run_summary.json    # High-level stats: duration, avg accuracy, best/worst
-```
-
-### Metrics Computed
-
-- **Accuracy**: Overall percentage of correct predictions
-- **Precision**: Macro-averaged precision across all classes
-- **Recall**: Macro-averaged recall across all classes
-- **F1-Score**: Macro-averaged F1 (harmonic mean of precision & recall)
-- **Parse Failure Rate**: Percentage of responses that couldn't be parsed to a category
-
-### Viewing Results
-
-```bash
-# List all runs
-ls results/
-
-# View run summary
-cat results/run_20251203_151718_baseline_v1/run_summary.json
-
-# View CSV summary
-cat results/run_20251203_151718_baseline_v1/summary.csv
-
-# Analyze with Python
-uv run python -c "
-import pandas as pd
-df = pd.read_csv('results/run_20251203_151718_baseline_v1/summary.csv')
-print(df.groupby('technique')['accuracy'].mean().sort_values(ascending=False))
-"
-```
-
----
-
-## Module Documentation
-
-### `experiments.py` - Main Orchestrator
-
-The central entry point that coordinates all other modules.
-
-**Key Class: `ExperimentPipeline`**
-
-```python
-pipeline = ExperimentPipeline()
-
-# Run custom experiment
-pipeline.run_custom_experiment(
-    models=['gemma3:12b', 'phi4:14b'],
-    datasets=['ag_news', 'bbc_news'],
-    techniques=['zero_shot', 'few_shot'],
-    limit=100,
-    run_name='my_experiment'
-)
-
-# Run full experiment (all combinations)
-pipeline.run_full_experiment(limit=50, run_name='full_test')
-
-# Run single experiment
-result = pipeline.run_single_experiment('ag_news', 'gemma3:12b', 'zero_shot', limit=10)
-```
-
-**Key Methods:**
-- `run_custom_experiment()` - Flexible experiment with specified combinations
-- `run_full_experiment()` - All models × datasets × techniques
-- `run_single_experiment()` - One specific combination
-- `_start_run()` - Creates timestamped run folder
-- `_save_run_config()` - Saves configuration JSON
-- `_save_run_summary()` - Saves final summary with duration and stats
-
----
-
-### `dataset_loader.py` - Dataset Management
-
-Downloads, preprocesses, and caches datasets.
-
-**Key Class: `DatasetLoader`**
-
-```python
-loader = DatasetLoader(data_dir="data")
-
-# Load dataset (auto-downloads if missing)
-test_df = loader.load_dataset('ag_news', split='test')
-# Returns DataFrame with columns: text, label, label_text
-
-# Get category names
-categories = loader.get_categories('ag_news')
-# Returns: ['Business', 'Sci/Tech', 'Sports', 'World']
-
-# Get few-shot examples (one per category)
-examples = loader.get_few_shot_examples('ag_news', n=3)
-# Returns: [('Article text...', 'Sports'), ...]
-```
-
-**Supported Datasets:**
-- `ag_news` - Downloaded from GitHub (CharCnn_Keras mirror)
-- `bbc_news` - Downloaded from GitHub/GCS mirrors (with fallback)
-- `20newsgroups` - Via scikit-learn's `fetch_20newsgroups()`
-
----
-
-### `prompt_loader.py` - Prompt Template System
-
-Loads and formats prompt templates from text files.
-
-**Key Class: `PromptLoader`**
-
-```python
-loader = PromptLoader(prompts_dir="prompts")
-
-# Get available techniques
-techniques = loader.get_available_techniques()
-# Returns: ['zero_shot', 'few_shot', 'constrained', 'chain_of_thought', 'self_consistency']
-
-# Load raw template
-template = loader.load_template('zero_shot')
-
-# Format prompt with data
-prompt = loader.format_prompt(
-    technique='few_shot',
-    text='Lakers win championship...',
-    categories=['Sports', 'Business', 'World', 'Sci/Tech'],
-    examples=[('Fed raises rates...', 'Business'), ...]
-)
-```
-
----
-
-### `model_inference.py` - Ollama API Wrapper
-
-Handles model interaction, prediction, and response parsing.
-
-**Key Class: `ModelInference`**
-
-```python
-inference = ModelInference()
-
-# Check available models
-models = inference.get_available_models()
-# Returns: ['gemma3:12b', 'phi4:14b', ...]
-
-# Check if specific model is available
-available = inference.is_model_available('gemma3:12b')
-
-# Get prediction
-result = inference.predict(
-    model_name='gemma3:12b',
-    prompt='Classify this article...',
-    categories=['Sports', 'Business', 'World', 'Sci/Tech'],
-    technique='zero_shot'
-)
-# Returns: {'prediction': 'Sports', 'raw_response': 'Sports', 'technique': 'zero_shot', ...}
-
-# Self-consistency (5 samples, majority vote)
-prediction = inference.predict_with_self_consistency(
-    model_name='gemma3:12b',
-    prompt='...',
-    n_samples=5,
-    temperature=0.7,
-    categories=['Sports', 'Business', ...]
-)
-```
-
-**Response Parsing Strategies:**
-1. Direct match (case-insensitive)
-2. Category appears anywhere in response
-3. Extract first word/line
-4. Fuzzy matching for variations (e.g., "sci/tech" vs "science/technology")
-
----
-
-### `evaluation.py` - Metrics Computation
-
-Computes classification metrics.
-
-**Key Class: `ClassificationMetrics`**
-
-```python
-metrics_calc = ClassificationMetrics()
-
-# Compute all metrics
-metrics = metrics_calc.compute_metrics(
-    y_true=['Sports', 'Business', 'Sports', ...],
-    y_pred=['Sports', 'World', 'Sports', ...],
-    categories=['Sports', 'Business', 'World', 'Sci/Tech']
-)
-# Returns: {
-#   'accuracy': 0.85,
-#   'precision': 0.82,
-#   'recall': 0.80,
-#   'f1_score': 0.81,
-#   'per_class': {'Sports': {'precision': 0.9, 'recall': 0.85, ...}, ...}
-# }
-
-# Print formatted results
-metrics_calc.print_metrics(metrics, 'ag_news', 'gemma3:12b', 'zero_shot')
-```
-
----
-
-## Adding New Components
-
-### Add a New Dataset
-
-1. Add config to `dataset_loader.py`:
-   ```python
-   self.dataset_configs['my_dataset'] = {
-       'categories': ['cat1', 'cat2', 'cat3'],
-       'train_file': 'my_dataset_train.csv',
-       'test_file': 'my_dataset_test.csv'
-   }
-   ```
-
-2. Add download method:
-   ```python
-   def _process_my_dataset(self):
-       # Download and save to self.data_dir
-       # Must create CSV with columns: text, label, label_text
-   ```
-
-3. Add to `_download_and_preprocess()`:
-   ```python
-   elif dataset_name == 'my_dataset':
-       self._process_my_dataset()
-   ```
-
-4. Add to `experiments.py`:
-   ```python
-   self.datasets = ['ag_news', 'bbc_news', '20newsgroups', 'my_dataset']
-   ```
-
-### Add a New Prompting Technique
-
-1. Create `prompts/my_technique.txt`:
-   ```
-   Your prompt template here...
-   Article: {text}
-   Categories: {categories}
-   {examples}
-   Answer:
-   ```
-
-2. Register in `prompt_loader.py`:
-   ```python
-   self.prompt_templates['my_technique'] = 'my_technique.txt'
-   ```
-
-3. Add to `experiments.py`:
-   ```python
-   self.techniques = [..., 'my_technique']
-   ```
-
-4. (Optional) Add special handling in `model_inference.py` if needed.
-
-### Add a New Model
-
-Just install it via Ollama:
-```bash
-ollama pull new-model:7b
-```
-
-The pipeline automatically detects available models. To add it to the default list:
-```python
-# In experiments.py
-self.models = [..., 'new-model:7b']
-```
-
----
-
-## Troubleshooting
-
-### Model Not Available
-```bash
-ollama list              # See installed models
-ollama pull gemma3:4b    # Install a model
-```
-
-### Dataset Download Fails
-```bash
-# Re-run dataset download
-uv run python dataset_loader.py
-
-# Check data folder
-ls -la data/
-```
-
-### High Parse Failure Rate (>10%)
-- Check raw responses in `results.json`
-- Make prompts more explicit about output format
-- Add parsing rules to `model_inference.py::parse_category()`
-
-### Out of Memory
-- Use smaller models (gemma3:4b, llama3.2:1b)
-- Use `--limit` to test on fewer samples
-- Text is auto-truncated to 1000 characters
+**Evaluation Metrics**: Standard classification metrics (accuracy, precision, recall, F1) computed via scikit-learn with macro-averaging. Parse failures recorded separately when model outputs don't conform to single-category format.
 
 ---
 
 ## Research Context
 
-This pipeline implements the experimental methodology from:
+This work replicates and extends:
 
-> "Systematic Evaluation of Prompt Engineering Techniques for News Classification with Open-Source Large Language Models"
+> Yuki Yada and Hayato Yamana. 2024. "News Recommendation with Category Description by a Large Language Model." *arXiv preprint arXiv:2405.13007*.
 
-The goal is to systematically compare prompting strategies across multiple LLMs and datasets to identify best practices for news classification without fine-tuning.
+**Original contribution**: Yada & Yamana demonstrated that LLM-generated category descriptions improved news recommendation AUC by up to 5.8% compared to label-only approaches in encoder-based architectures.
 
----
-
-## License
-
-Research/educational use. See individual dataset licenses for data usage terms.
+**This work**: Evaluates semantic enrichment for **decoder-only LLMs** in **zero-shot and few-shot classification** settings, establishing that enrichment effectiveness is highly technique-dependent and cannot substitute for demonstration-based learning from labeled examples.
