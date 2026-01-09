@@ -1,0 +1,12 @@
+Classify this news article into ONE of the following categories:
+
+{categories}
+
+Examples:
+{examples}
+
+Article: {text}
+
+Answer with ONLY the category name.
+
+Category:

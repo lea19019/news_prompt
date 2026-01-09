@@ -1,0 +1,308 @@
+Abstract
+Large Language Models (LLMs) have shown promising results in news classification tasks through
+prompting, yet systematic comparisons of prompt engineering techniques on open-source models remain
+limited. This study evaluates five prompt engineering techniques, zero-shot, few-shot, constrained output,
+chain-of-thought, and self-consistency, across eight recent open-source LLMs on three benchmark news
+classification datasets. We investigate which prompting strategies yield optimal performance for singlelabel news classification and how effectiveness varies across model architectures and dataset
+characteristics. Our experimental pipeline will be held using Ollama in the CS 653 GPUs, it will enable
+comprehensive evaluation across 120+ model-prompt-dataset combinations. Results will provide evidencebased guidance for practitioners selecting prompting strategies for classification tasks with open-source
+models, contributing both empirical benchmarks and practical recommendations to the growing body of
+prompt engineering research
+1. Introduction
+News classification through prompting has
+emerged as a practical alternative to fine-tuning
+for deploying large language models. Recent
+work has shown that carefully designed prompts
+can elicit strong classification performance from
+pretrained models without task-specific training.
+However, most studies have focused on
+proprietary models like GPT-4 or evaluated only
+specific prompting techniques in isolation. The
+rapid release of open-source LLMs in 2024 and
+2025, spanning diverse architectures from
+compact 4B-parameter models to 24B-parameter
+systems, creates an urgent need for systematic
+evaluation of prompt engineering techniques
+across these models.
+The challenge for practitioners is clear: given a
+classification task and an open-source model,
+which prompting strategy should be used? Zeroshot prompts are simple but may underperform.
+Few-shot examples improve accuracy but
+require careful selection. Constrained output
+formats reduce parsing errors but may limit
+model expressiveness. Chain-of-thought
+prompting shows promise for reasoning tasks
+but adds computational overhead. Selfconsistency aggregates multiple predictions for
+robustness but multiplies inference costs.
+Without empirical comparisons across models
+and datasets, practitioners resort to trial-anderror, wasting development time and compute
+resources.
+This work provides an evaluation of five prompt
+engineering techniques across eight recent opensource LLMs on three news classification
+benchmarks. We examine how model
+architecture (general-purpose vs. reasoningspecialized), size (4B to 24B parameters), and
+dataset complexity (4-class to 20-class
+categorization) affect prompt effectiveness. Our
+contributions include: (1) empirical benchmarks
+comparing prompting strategies across 120+
+experimental conditions, (2) analysis of
+accuracy-cost trade-offs for different
+approaches, and (3) practical recommendations
+for selecting prompts based on model
+characteristics and task requirements.
+2. Methodology
+2.1 Datasets
+We evaluate prompt techniques across three
+benchmark news classification datasets
+representing different granularities and domains.
+The AG News dataset contains 120,000 training
+articles and 7,600 test articles categorized into
+four classes: Sports, Business,
+Science/Technology, and World news. This
+dataset provides a baseline for coarse-grained
+classification with clear semantic boundaries
+between categories. The BBC News dataset
+comprises approximately 2,225 articles across
+five categories: Business, Entertainment,
+Politics, Sport, and Technology. This
+intermediate-complexity dataset introduces finer
+distinctions, particularly between Business and
+Technology categories that may overlap. The 20
+Newsgroups dataset presents the greatest
+challenge with approximately 18,000 documents
+spanning twenty distinct topics in discussion
+forum format, requiring the model to distinguish
+between closely related categories.
+These datasets provide varying levels of
+classification difficulty, from coarse-grained
+four-class categorization to fine-grained twentyclass distinction. This range allows us to assess
+how prompt techniques perform across different
+task complexities and whether strategies that
+succeed on simple tasks scale to more
+challenging scenarios. The BBC News dataset
+example below illustrates the classification task
+structure:
+text label label_text
+wales want rugby
+league…
+2 sport
+china aviation
+seeks rescue…
+1 business
+rock band u2
+break ticket…
+3 entertainment
+Complete dataset details are provided in
+Appendix A.
+2.2 Models
+We evaluate eight recent open-source LLMs
+spanning multiple architectures, sizes, and
+design philosophies. The selection includes
+Gemma3 at both 4B and 12B parameters from
+Google, representing compact and balanced
+configurations. Microsoft's Phi-4 at 14B
+parameters emphasizes reasoning capabilities.
+OpenAI's GPT-OSS at 20B parameters
+represents their first open-weight model release.
+Alibaba's Qwen3 at 8B parameters brings strong
+multilingual support. Mistral's Small 3.2 at 24B
+parameters represents the largest model in our
+evaluation. DeepSeek-R1 at 8B parameters
+offers a reasoning-specialized architecture, while
+OLMo2 at 7B parameters provides a fully open
+alternative with transparent training data and
+methodology.
+These models were selected based on several
+criteria. First, all models were released between
+2024 and 2025, ensuring we evaluate
+contemporary architectures. Second, all models
+support news classification tasks and can be
+deployed via Ollama on our class GPUs
+infrastructure. Third, the parameter range from
+4B to 24B allows us to examine how model
+scale interacts with prompting technique
+effectiveness. Fourth, the architectural diversity
+enables comparisons between general-purpose
+models, reasoning-specialized models, and
+multilingual models. Complete model
+specifications are provided in Appendix B.
+2.3 Prompt Engineering Techniques
+We evaluate five core prompt engineering
+techniques drawn from the comprehensive
+taxonomy presented in "The Prompt Report" by
+Schulhoff et al. [1]. Each technique represents a
+distinct approach to eliciting classification
+behavior, progressing from simple instructionbased prompts to more complex ensemble
+methods.
+Zero-shot prompting provides only task
+instructions without examples, relying entirely
+on the model's pre-existing capabilities. Our
+template explicitly enumerates valid categories
+to reduce hallucination of invalid labels. This
+design follows findings by Sun et al. [3], who
+observed 8-12% accuracy improvements when
+categories are explicitly listed versus openended questions.
+Few-shot prompting includes three labeled
+examples before the target classification
+instance, leveraging in-context learning through
+input-output demonstrations. We selected three
+examples based on context length constraints
+across our model range and evidence from
+Brown et al. (2020) showing diminishing returns
+beyond 3-5 examples for classification tasks.
+Examples are stratified across different
+categories and remain fixed across all test
+instances to ensure reproducibility. Each
+example is short (5-7 words), unambiguous, and
+presented in dash-list format with arrow notation
+(→) separating input from output.
+Constrained output extends few-shot
+prompting by explicitly restricting response
+format. The prompt instructs models to "Answer
+with ONLY ONE WORD from: [category list]"
+to address two common failure modes: verbose
+explanations and invalid category names. This
+approach follows structured output generation
+research [5], which found explicit format
+constraints reduce parsing errors by 15-30%.
+Chain-of-thought prompting encourages
+explicit reasoning before classification through a
+three-step process: identify the main topic,
+determine the best category, and provide the
+answer. Wei et al. (2022) demonstrated that CoT
+improves performance on reasoning tasks by
+articulating intermediate steps. However, its
+effectiveness for straightforward classification
+versus complex multi-step reasoning remains an
+open empirical question. The structured steps
+provide consistency compared to free-form
+"explain your reasoning" approaches.
+Self-consistency implements an ensemble
+approach by generating five independent 
+predictions with temperature 0.7 and selecting
+the category via majority voting. Wang et al.
+(2022) found 10-20% accuracy improvements
+on reasoning tasks using this technique. We use
+five samples to balance robustness with
+computational cost (5× inference time),
+following standard self-consistency
+recommendations. Temperature 0.7 provides
+sufficient diversity for meaningful voting while
+avoiding excessive randomness.
+Complete prompt templates are provided in
+Appendix C.
+2.4 Experimental Setup
+All experiments will be conducted on the class
+GPUs using Ollama. This infrastructure provides
+consistent hardware conditions across all
+evaluations, eliminating confounding variables
+from heterogeneous computing environments.
+We will implement an automated evaluation
+pipeline that systematically processes each
+dataset-model-prompt combination. For each
+dataset, the pipeline loads the test set and
+preprocesses the text. It then generates prompts
+according to each technique's template, for fewshot methods, we select three representative
+training examples covering different categories
+and keep these fixed across all test instances.
+The pipeline will query the models via the
+Ollama API using temperature 0.0 for
+deterministic techniques (zero-shot, few-shot,
+constrained output, chain-of-thought) and
+temperature 0.7 for self-consistency.
+Model outputs will be parsed to extract predicted
+categories using pattern matching that handles
+common response variations. For selfconsistency, we generate five independent
+predictions per instance and select the category
+via majority voting. The pipeline will record all
+predictions, inference latencies, and parsing
+success rates in structured format.
+The experimental scope encompasses
+approximately 120 evaluation conditions (8
+models × 5 prompts × 3 datasets). To ensure
+reproducibility, we will fix random seeds, use
+identical test sets across all models, and
+maintain consistent prompt templates that vary
+only in category labels and domain terminology.
+2.5 Evaluation Metrics
+We will evaluate classification performance
+using four standard metrics:
+• Accuracy: Measures the proportion of
+correctly classified instances, providing
+an overall performance summary.
+• Precision: Quantifies the proportion of
+predicted positives that are true positives
+for each class.
+• Recall: Measures the proportion of
+actual positives correctly identified for
+each class.
+• F1-Score: Computes the harmonic
+mean of precision and recall for each
+class, then averages these scores across
+all classes (macro-averaging), ensuring
+that all classes contribute equally to the
+final metric regardless of their frequency
+in the test set.
+These metrics provide complementary
+perspectives on model performance. While
+accuracy offers a single-number summary, it can
+be misleading when class distributions are
+imbalanced. Precision and recall reveal how
+models perform on individual categories—for
+instance, whether they confidently predict
+common categories while struggling with rare
+ones. Macro-averaged F1 is particularly
+important for datasets like BBC News where
+category sizes may vary, as it prevents
+performance on majority classes from
+dominating the evaluation.
+
+Appendix A
+Dataset Categories Size Domain
+AG News 4 (Sports, Business, Sci/Tech, World) 120K train / 7.6K test News articles
+BBC News 5 (Business, Entertainment, Politics,
+Sport, Tech)
+~2,225 articles News articles
+20 Newsgroups 20 topics ~18K documents Discussion forums
+Appendix B
+Models Size Notes
+gemma3:12b 12B Google, balanced size
+phi4:14b 14B Microsoft, reasoning
+gpt-oss:20b 21B OpenAI, novel
+qwen3:8b 8B Alibaba, multilingual
+mistral-small3.2:24b 24B Mistral, largest/latest
+gemma3:4b 4B Compact baseline
+deepseek-r1:8b 8B Test reasoning model (optional)
+olmo2:7b 7B Fully open alternative
+Appendix C
+1. Zero-shot
+Classify	this	news	article	into	one	category:	Sports,	Business,	Technology,	World
+Article:	[text]
+No examples provided; relies solely on instruction clarity
+2. Few-shot (3-shot)
+Classify	news	articles	into	categories.
+Examples:
+- "Lakers	win	NBA	championship"	→	Sports
+- "Federal	Reserve	raises	interest	rates"	→	Business
+- "UN	climate	summit	in	Paris"	→	World
+Article:	[text]
+Category:
+Provides 3 labeled examples to guide classification
+3. Constrained Output
+[3	examples	from	few-shot]
+Article:	[text]
+Answer	with	ONLY	ONE	WORD	from:	Sports,	Business,	Technology,	World
+Forces specific output format to improve parsing reliability
+4. Chain-of-Thought
+[3	examples	with	reasoning]
+Let's	think	step	by	step:
+1.	Identify	the	main	topic
+2.	Determine	the	best	category
+3.	Provide	your	answer
+Article:	[text]
+Encourages explicit reasoning before classification
+5. Self-Consistency
+[Best	performing	prompt	from	above]
+→	Run	5	times	with	temperature=0.7
+→	Take	majority	vote	as	final	answer
+Aggregates multiple predictions to improve robustness

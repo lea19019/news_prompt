@@ -1,0 +1,24 @@
+{
+  "run_name": null,
+  "start_time": "2025-12-03T22:48:14.546701",
+  "datasets": [
+    "20newsgroups"
+  ],
+  "models": [
+    "gemma3:12b",
+    "llama3.2:1b",
+    "gpt-oss:20b"
+  ],
+  "techniques": [
+    "zero_shot",
+    "few_shot_3",
+    "few_shot_5",
+    "chain_of_thought",
+    "zero_shot_enriched",
+    "few_shot_3_enriched",
+    "few_shot_5_enriched",
+    "chain_of_thought_enriched"
+  ],
+  "limit": 300,
+  "total_experiments": 24
+}

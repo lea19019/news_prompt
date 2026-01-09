@@ -1,0 +1,42 @@
+[
+  {
+    "dataset": "ag_news",
+    "model": "gemma3:12b",
+    "technique": "zero_shot",
+    "timestamp": "2025-12-03T17:58:08.524270",
+    "n_samples": 7600,
+    "metrics": {
+      "accuracy": 0.8177631578947369,
+      "precision": 0.8485481229046447,
+      "recall": 0.8177631578947369,
+      "f1_score": 0.8098458284778329,
+      "parse_failure_rate": 0.0
+    },
+    "per_class_metrics": {
+      "Business": {
+        "precision": 0.6525267428992991,
+        "recall": 0.9310526315789474,
+        "f1_score": 0.7672955974842767,
+        "support": 1900
+      },
+      "Sci/Tech": {
+        "precision": 0.9310689310689311,
+        "recall": 0.4905263157894737,
+        "f1_score": 0.6425370561875215,
+        "support": 1900
+      },
+      "Sports": {
+        "precision": 0.9657172995780591,
+        "recall": 0.9636842105263158,
+        "f1_score": 0.9646996838777661,
+        "support": 1900
+      },
+      "World": {
+        "precision": 0.8448795180722891,
+        "recall": 0.8857894736842106,
+        "f1_score": 0.8648509763617677,
+        "support": 1900
+      }
+    }
+  }
+]

@@ -1,0 +1,14 @@
+[project]
+name = "news-classification-prompts"
+version = "0.1.0"
+description = "Systematic Evaluation of Prompt Engineering Techniques for News Classification with Open-Source LLMs"
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = [
+    "pandas",
+    "scikit-learn",
+    "requests",
+    "tqdm",
+    "ollama",
+    "numpy",
+]

@@ -1,0 +1,16 @@
+{
+  "run_name": null,
+  "start_time": "2025-12-03T17:15:16.239472",
+  "datasets": [
+    "ag_news"
+  ],
+  "models": [
+    "gemma3:12b"
+  ],
+  "techniques": [
+    "zero_shot",
+    "zero_shot_enriched"
+  ],
+  "limit": 20,
+  "total_experiments": 2
+}

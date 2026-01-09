@@ -1,0 +1,12 @@
+Classify this news article into ONE of the following categories based on these descriptions:
+
+{enriched_categories}
+
+Let's think step by step:
+1. Identify the main topic and key themes in the article
+2. Match these themes to the most appropriate category description above
+3. Provide your final answer
+
+Article: {text}
+
+Category:

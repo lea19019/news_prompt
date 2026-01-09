@@ -1,0 +1,44 @@
+# chain of thought enriched old
+Classify this news article into ONE of the following categories:
+
+{enriched_categories}
+
+Let's think step by step:
+1. Identify the main topic and key themes in the article
+2. Match these themes to the most appropriate category description above
+3. Provide your final answer
+
+Article: {text}
+
+Category:
+
+
+
+# Few shot enriched old
+Classify news articles into categories based on these descriptions:
+
+{enriched_categories}
+
+Examples:
+{examples}
+
+Article: {text}
+
+Answer with ONLY the category name.
+
+Category:
+
+
+# Few shot old
+Classify news articles into categories based on these descriptions:
+
+{categories}
+
+Examples:
+{examples}
+
+Article: {text}
+
+Answer with ONLY the category name.
+
+Category:

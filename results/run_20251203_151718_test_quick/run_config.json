@@ -1,0 +1,29 @@
+{
+  "run_name": null,
+  "start_time": "2025-12-03T15:17:18.641063",
+  "datasets": [
+    "ag_news",
+    "bbc_news",
+    "20newsgroups"
+  ],
+  "models": [
+    "gemma3:270m",
+    "gemma3:12b",
+    "phi4:14b",
+    "qwen3:8b",
+    "qwen3:32b",
+    "gpt-oss:20b",
+    "llama3.2:1b",
+    "mistral:7b",
+    "r1-1776:70b"
+  ],
+  "techniques": [
+    "zero_shot",
+    "few_shot",
+    "constrained",
+    "chain_of_thought",
+    "self_consistency"
+  ],
+  "limit": 2,
+  "total_experiments": 135
+}

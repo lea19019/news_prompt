@@ -1,0 +1,4 @@
+dataset,accuracy_mean,accuracy_std,accuracy_min,accuracy_max,precision_mean,precision_std,recall_mean,recall_std,f1_score_mean,f1_score_std,parse_failure_rate_mean,parse_failure_rate_std
+bbc_news,0.7578,0.2137,0.3067,0.9567,0.8855,0.1086,0.7471,0.2131,0.7654,0.2203,0.0421,0.0588
+ag_news,0.6186,0.1586,0.3,0.8633,0.8131,0.113,0.6186,0.1586,0.6669,0.1683,0.1204,0.1639
+20newsgroups,0.281,0.2202,0.0633,0.66,0.6429,0.2922,0.2748,0.2149,0.3838,0.182,0.3182,0.3669

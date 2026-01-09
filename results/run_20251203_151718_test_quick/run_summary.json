@@ -1,0 +1,90 @@
+{
+  "run_name": null,
+  "start_time": "2025-12-03T15:17:18.641063",
+  "end_time": "2025-12-03T15:30:13.131425",
+  "duration_seconds": 774.490362,
+  "duration_formatted": "0:12:54.490362",
+  "total_experiments": 135,
+  "avg_accuracy": 0.5148148148148148,
+  "avg_f1_score": 0.604938271604938,
+  "best_result": {
+    "dataset": "ag_news",
+    "model": "gemma3:270m",
+    "technique": "chain_of_thought",
+    "timestamp": "2025-12-03T15:17:24.385195",
+    "n_samples": 2,
+    "metrics": {
+      "accuracy": 1.0,
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "parse_failure_rate": 0.0
+    },
+    "per_class_metrics": {
+      "Business": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 1
+      },
+      "Sci/Tech": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1_score": 1.0,
+        "support": 1
+      },
+      "Sports": {
+        "precision": null,
+        "recall": null,
+        "f1_score": null,
+        "support": 0
+      },
+      "World": {
+        "precision": null,
+        "recall": null,
+        "f1_score": null,
+        "support": 0
+      }
+    }
+  },
+  "worst_result": {
+    "dataset": "ag_news",
+    "model": "gemma3:270m",
+    "technique": "few_shot",
+    "timestamp": "2025-12-03T15:17:22.470365",
+    "n_samples": 2,
+    "metrics": {
+      "accuracy": 0.0,
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1_score": 0.0,
+      "parse_failure_rate": 1.0
+    },
+    "per_class_metrics": {
+      "Business": {
+        "precision": null,
+        "recall": 0.0,
+        "f1_score": null,
+        "support": 1
+      },
+      "Sci/Tech": {
+        "precision": null,
+        "recall": 0.0,
+        "f1_score": null,
+        "support": 1
+      },
+      "Sports": {
+        "precision": null,
+        "recall": null,
+        "f1_score": null,
+        "support": 0
+      },
+      "World": {
+        "precision": null,
+        "recall": null,
+        "f1_score": null,
+        "support": 0
+      }
+    }
+  }
+}

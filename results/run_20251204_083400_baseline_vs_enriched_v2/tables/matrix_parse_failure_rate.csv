@@ -1,0 +1,10 @@
+dataset,model,chain_of_thought,chain_of_thought_enriched,few_shot_3,few_shot_3_enriched,few_shot_5,few_shot_5_enriched,zero_shot,zero_shot_enriched
+20newsgroups,gemma3:12b,0.4733,0.24,0.0033,0.0033,0.0133,0.0033,0.0167,0.0033
+20newsgroups,gpt-oss:20b,0.8533,0.8467,0.81,0.7733,0.79,0.76,0.8133,0.79
+20newsgroups,llama3.2:1b,0.1767,0.1567,0.0133,0.03,0.02,0.0233,0.0067,0.0167
+ag_news,gemma3:12b,0.0,0.0167,0.0,0.0,0.0,0.0,0.0,0.0
+ag_news,gpt-oss:20b,0.3567,0.2933,0.34,0.3867,0.38,0.3867,0.3233,0.2867
+ag_news,llama3.2:1b,0.0133,0.0767,0.0,0.0033,0.0133,0.0033,0.0067,0.0033
+bbc_news,gemma3:12b,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+bbc_news,gpt-oss:20b,0.1533,0.1533,0.0867,0.1067,0.1,0.12,0.11,0.1367
+bbc_news,llama3.2:1b,0.0,0.0,0.0067,0.0,0.0067,0.0033,0.0267,0.0

@@ -1,0 +1,2 @@
+dataset,model,technique,accuracy,precision,recall,f1_score,parse_failure_rate,n_samples,timestamp
+ag_news,gemma3:12b,zero_shot,0.3333333333333333,0.3333333333333333,0.5,0.5,0.0,3,2025-12-03T15:16:55.059892

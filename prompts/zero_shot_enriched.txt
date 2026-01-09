@@ -1,0 +1,9 @@
+Classify this news article into ONE of the following categories based on these descriptions:
+
+{enriched_categories}
+
+Article: {text}
+
+Answer with ONLY the category name.
+
+Category:

@@ -1,0 +1,4 @@
+model,accuracy_mean,accuracy_std,accuracy_min,accuracy_max,precision_mean,precision_std,recall_mean,recall_std,f1_score_mean,f1_score_std,parse_failure_rate_mean,parse_failure_rate_std
+gemma3:12b,0.7383,0.1866,0.3067,0.9567,0.8272,0.0955,0.7308,0.1904,0.7359,0.1854,0.0322,0.1058
+gpt-oss:20b,0.5464,0.2814,0.1433,0.8767,0.9451,0.0326,0.5396,0.28,0.6642,0.2088,0.4232,0.2925
+llama3.2:1b,0.3726,0.2468,0.0633,0.88,0.5692,0.2346,0.3701,0.2421,0.4161,0.2348,0.0253,0.0466

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Experiment Results Report</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 { color: #2c3e50; border-bottom: 3px solid #3498db; padding-bottom: 10px; }
+        h2 { color: #34495e; margin-top: 40px; }
+        .summary-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .metric {
+            display: inline-block;
+            margin: 10px 20px;
+            text-align: center;
+        }
+        .metric-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+        }
+        .metric-label {
+            color: #7f8c8d;
+            font-size: 0.9em;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            background: white;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px 8px;
+            text-align: center;
+        }
+        th {
+            background: #3498db;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        tr:hover {
+            background: #f1f1f1;
+        }
+        .figure-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            text-align: center;
+        }
+        .figure-container img {
+            max-width: 100%;
+            height: auto;
+        }
+        .positive { color: #27ae60; }
+        .negative { color: #e74c3c; }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>📊 News Classification Experiment Results</h1>
+    
+    <div class="summary-box">
+        <h2>Run Summary</h2>
+        <div class="metric">
+            <div class="metric-value">72</div>
+            <div class="metric-label">Total Experiments</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">55.2%</div>
+            <div class="metric-label">Avg Accuracy</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">60.5%</div>
+            <div class="metric-label">Avg F1 Score</div>
+        </div>
+        <div class="metric">
+            <div class="metric-value">3:32:15</div>
+            <div class="metric-label">Duration</div>
+        </div>
+        <p><strong>Models:</strong> gemma3:12b, llama3.2:1b, gpt-oss:20b</p>
+        <p><strong>Datasets:</strong> ag_news, bbc_news, 20newsgroups</p>
+        <p><strong>Techniques:</strong> zero_shot, few_shot_3, few_shot_5, chain_of_thought, zero_shot_enriched, few_shot_3_enriched, few_shot_5_enriched, chain_of_thought_enriched</p>
+    </div>
+    
+    <h2>🏆 Top 10 Results</h2>
+    <table>
+        <tr>
+            <th>Rank</th>
+            <th>Dataset</th>
+            <th>Model</th>
+            <th>Technique</th>
+            <th>Accuracy</th>
+            <th>F1 Score</th>
+        </tr>
+        <tr>
+            <td>1</td>
+            <td>bbc_news</td>
+            <td>gemma3:12b</td>
+            <td>few_shot_5</td>
+            <td>95.7%</td>
+            <td>95.4%</td>
+        </tr>
+        <tr>
+            <td>2</td>
+            <td>bbc_news</td>
+            <td>gemma3:12b</td>
+            <td>few_shot_5_enriched</td>
+            <td>95.7%</td>
+            <td>95.4%</td>
+        </tr>
+        <tr>
+            <td>3</td>
+            <td>bbc_news</td>
+            <td>gemma3:12b</td>
+            <td>zero_shot_enriched</td>
+            <td>95.3%</td>
+            <td>95.2%</td>
+        </tr>
+        <tr>
+            <td>4</td>
+            <td>bbc_news</td>
+            <td>gemma3:12b</td>
+            <td>few_shot_3_enriched</td>
+            <td>95.0%</td>
+            <td>94.8%</td>
+        </tr>
+        <tr>
+            <td>5</td>
+            <td>bbc_news</td>
+            <td>gemma3:12b</td>
+            <td>few_shot_3</td>
+            <td>94.0%</td>
+            <td>93.7%</td>
+        </tr>
+        <tr>
+            <td>6</td>
+            <td>bbc_news</td>
+            <td>gemma3:12b</td>
+            <td>zero_shot</td>
+            <td>93.0%</td>
+            <td>92.6%</td>
+        </tr>
+        <tr>
+            <td>7</td>
+            <td>bbc_news</td>
+            <td>llama3.2:1b</td>
+            <td>few_shot_3</td>
+            <td>88.0%</td>
+            <td>87.9%</td>
+        </tr>
+        <tr>
+            <td>8</td>
+            <td>bbc_news</td>
+            <td>gpt-oss:20b</td>
+            <td>few_shot_3_enriched</td>
+            <td>87.7%</td>
+            <td>91.0%</td>
+        </tr>
+        <tr>
+            <td>9</td>
+            <td>bbc_news</td>
+            <td>gpt-oss:20b</td>
+            <td>few_shot_3</td>
+            <td>87.3%</td>
+            <td>90.1%</td>
+        </tr>
+        <tr>
+            <td>10</td>
+            <td>bbc_news</td>
+            <td>gpt-oss:20b</td>
+            <td>few_shot_5</td>
+            <td>87.3%</td>
+            <td>90.8%</td>
+        </tr>
+    </table>
+    
+    <h2>📈 Baseline vs Enriched Comparison</h2>
+    <table>
+        <tr>
+            <th>Technique</th>
+            <th>Baseline</th>
+            <th>Enriched</th>
+            <th>Improvement</th>
+        </tr>
+        <tr>
+            <td>zero_shot</td>
+            <td>57.3%</td>
+            <td>55.6%</td>
+            <td class="negative">↓ -1.7%</td>
+        </tr>
+        <tr>
+            <td>few_shot_3</td>
+            <td>61.8%</td>
+            <td>55.3%</td>
+            <td class="negative">↓ -6.5%</td>
+        </tr>
+        <tr>
+            <td>few_shot_5</td>
+            <td>62.0%</td>
+            <td>56.9%</td>
+            <td class="negative">↓ -5.0%</td>
+        </tr>
+        <tr>
+            <td>chain_of_thought</td>
+            <td>41.4%</td>
+            <td>51.7%</td>
+            <td class="positive">↑ +10.3%</td>
+        </tr>
+    </table>
+    
+    <h2>📊 Visualizations</h2>
+    
+    <div class="grid">
+        <div class="figure-container">
+            <h3>Accuracy by Technique</h3>
+            <img src="figures/accuracy_by_technique.png" alt="Accuracy by Technique">
+        </div>
+        <div class="figure-container">
+            <h3>Baseline vs Enriched</h3>
+            <img src="figures/baseline_vs_enriched.png" alt="Baseline vs Enriched">
+        </div>
+    </div>
+    
+    <div class="figure-container">
+        <h3>Model × Technique Heatmap</h3>
+        <img src="figures/heatmap_model_technique.png" alt="Heatmap Model Technique">
+    </div>
+    
+    <div class="figure-container">
+        <h3>Dataset × Technique Heatmap</h3>
+        <img src="figures/heatmap_dataset_technique.png" alt="Heatmap Dataset Technique">
+    </div>
+    
+    <div class="grid">
+        <div class="figure-container">
+            <h3>Model Performance Distribution</h3>
+            <img src="figures/model_boxplot.png" alt="Model Boxplot">
+        </div>
+        <div class="figure-container">
+            <h3>Dataset Difficulty</h3>
+            <img src="figures/dataset_boxplot.png" alt="Dataset Boxplot">
+        </div>
+    </div>
+    
+    <div class="grid">
+        <div class="figure-container">
+            <h3>Accuracy vs F1 Score</h3>
+            <img src="figures/accuracy_vs_f1.png" alt="Accuracy vs F1">
+        </div>
+        <div class="figure-container">
+            <h3>Parse Failure Rate</h3>
+            <img src="figures/parse_failure_rate.png" alt="Parse Failure Rate">
+        </div>
+    </div>
+    
+    <div class="figure-container">
+        <h3>Enriched Improvement by Dataset</h3>
+        <img src="figures/enriched_improvement.png" alt="Enriched Improvement">
+    </div>
+    
+    <footer style="text-align: center; color: #7f8c8d; margin-top: 40px; padding: 20px;">
+        Generated on {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}
+    </footer>
+</body>
+</html>

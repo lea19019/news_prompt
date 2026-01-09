@@ -1,0 +1,155 @@
+================================================================================
+ STATISTICAL SUMMARY REPORT
+ News Classification Experiment Analysis
+================================================================================
+
+1. OVERALL STATISTICS
+----------------------------------------
+   Total experiments: 72
+   Models tested: 3 (gemma3:12b, llama3.2:1b, gpt-oss:20b)
+   Datasets tested: 3 (ag_news, bbc_news, 20newsgroups)
+   Techniques tested: 8
+
+2. METRIC DISTRIBUTIONS
+----------------------------------------
+
+   ACCURACY:
+      Mean:   55.25%
+      Std:    28.16%
+      Median: 58.00%
+      Min:    6.33%
+      Max:    95.67%
+      IQR:    53.00%
+
+   PRECISION:
+      Mean:   78.05%
+      Std:    21.47%
+      Median: 86.37%
+      Min:    12.72%
+      Max:    98.72%
+      IQR:    23.47%
+
+   RECALL:
+      Mean:   54.68%
+      Std:    27.95%
+      Median: 56.79%
+      Min:    6.64%
+      Max:    95.28%
+      IQR:    52.10%
+
+   F1 SCORE:
+      Mean:   60.54%
+      Std:    24.93%
+      Median: 64.14%
+      Min:    10.21%
+      Max:    95.43%
+      IQR:    44.20%
+
+   PARSE FAILURE RATE:
+      Mean:   16.02%
+      Std:    25.91%
+      Median: 1.50%
+      Min:    0.00%
+      Max:    85.33%
+      IQR:    19.25%
+
+3. BEST AND WORST CONFIGURATIONS
+----------------------------------------
+
+   Best F1 Score:
+      Dataset: bbc_news
+      Model: gemma3:12b
+      Technique: few_shot_5_enriched
+      Metrics: Acc=95.67%, P=95.84%, R=95.28%, F1=95.43%
+
+   Worst F1 Score:
+      Dataset: 20newsgroups
+      Model: llama3.2:1b
+      Technique: few_shot_5
+      Metrics: Acc=6.33%, P=12.72%, R=6.64%, F1=10.21%
+
+4. BASELINE VS ENRICHED ANALYSIS
+----------------------------------------
+
+   ACCURACY:
+      Baseline:  55.61% ± 28.86%
+      Enriched:  54.88% ± 27.84%
+      Δ Change:  -0.73 percentage points (-1.3%)
+
+   PRECISION:
+      Baseline:  77.89% ± 22.04%
+      Enriched:  78.22% ± 21.20%
+      Δ Change:  +0.33 percentage points (+0.4%)
+
+   RECALL:
+      Baseline:  54.91% ± 28.74%
+      Enriched:  54.46% ± 27.55%
+      Δ Change:  -0.46 percentage points (-0.8%)
+
+   F1 SCORE:
+      Baseline:  60.52% ± 25.93%
+      Enriched:  60.56% ± 24.26%
+      Δ Change:  +0.04 percentage points (+0.1%)
+
+   PARSE FAILURE RATE:
+      Baseline:  16.43% ± 26.73%
+      Enriched:  15.62% ± 25.43%
+      Δ Change:  -0.81 percentage points (-4.9%)
+
+5. PER-DATASET ANALYSIS
+----------------------------------------
+
+   AG_NEWS:
+      F1 Score: 66.69% ± 16.83%
+      Accuracy: 61.86% ± 15.86%
+      Parse Fail: 12.0%
+      Best technique: few_shot_5 (F1=75.24%)
+
+   BBC_NEWS:
+      F1 Score: 76.54% ± 22.03%
+      Accuracy: 75.78% ± 21.37%
+      Parse Fail: 4.2%
+      Best technique: few_shot_3 (F1=90.56%)
+
+   20NEWSGROUPS:
+      F1 Score: 38.38% ± 18.20%
+      Accuracy: 28.10% ± 22.02%
+      Parse Fail: 31.8%
+      Best technique: few_shot_5_enriched (F1=42.08%)
+
+6. MODEL RANKING (by mean F1 Score)
+----------------------------------------
+   1. gemma3:12b: 73.59%
+   2. gpt-oss:20b: 66.42%
+   3. llama3.2:1b: 41.61%
+
+7. TECHNIQUE RANKING (by mean F1 Score)
+----------------------------------------
+   1. few_shot_3: 68.23%
+   2. few_shot_5: 68.01%
+   3. few_shot_5_enriched: 63.32%
+   4. zero_shot: 62.42%
+   5. few_shot_3_enriched: 61.96%
+   6. zero_shot_enriched: 60.95%
+   7. chain_of_thought_enriched: 56.00%
+   8. chain_of_thought: 43.41%
+
+8. CORRELATION ANALYSIS
+----------------------------------------
+
+   Pearson Correlation Matrix:
+                       accuracy  precision    recall  f1_score  parse_failure_rate
+   accuracy            1.000000   0.632220  0.999547  0.965171           -0.440994
+   precision           0.632220   1.000000  0.628663  0.736439            0.337788
+   recall              0.999547   0.628663  1.000000  0.965999           -0.445247
+   f1_score            0.965171   0.736439  0.965999  1.000000           -0.245556
+   parse_failure_rate -0.440994   0.337788 -0.445247 -0.245556            1.000000
+
+   Key Correlations:
+      Parse Failure ↔ F1 Score: r = -0.246
+      Precision ↔ Recall: r = 0.629
+      Accuracy ↔ F1 Score: r = 0.965
+
+================================================================================
+ END OF REPORT
+================================================================================

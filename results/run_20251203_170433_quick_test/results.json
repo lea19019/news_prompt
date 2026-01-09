@@ -1,0 +1,82 @@
+[
+  {
+    "dataset": "ag_news",
+    "model": "gemma3:12b",
+    "technique": "zero_shot",
+    "timestamp": "2025-12-03T17:05:02.846520",
+    "n_samples": 20,
+    "metrics": {
+      "accuracy": 0.45,
+      "precision": 0.5416666666666666,
+      "recall": 0.7105263157894737,
+      "f1_score": 0.3732193732193732,
+      "parse_failure_rate": 0.0
+    },
+    "per_class_metrics": {
+      "Business": {
+        "precision": 0.08333333333333333,
+        "recall": 1.0,
+        "f1_score": 0.15384615384615385,
+        "support": 1
+      },
+      "Sci/Tech": {
+        "precision": 1.0,
+        "recall": 0.42105263157894735,
+        "f1_score": 0.5925925925925926,
+        "support": 19
+      },
+      "Sports": {
+        "precision": null,
+        "recall": null,
+        "f1_score": null,
+        "support": 0
+      },
+      "World": {
+        "precision": null,
+        "recall": null,
+        "f1_score": null,
+        "support": 0
+      }
+    }
+  },
+  {
+    "dataset": "ag_news",
+    "model": "gemma3:12b",
+    "technique": "zero_shot_enriched",
+    "timestamp": "2025-12-03T17:05:09.358083",
+    "n_samples": 20,
+    "metrics": {
+      "accuracy": 0.65,
+      "precision": 0.4166666666666667,
+      "recall": 0.8157894736842105,
+      "f1_score": 0.5870967741935484,
+      "parse_failure_rate": 0.0
+    },
+    "per_class_metrics": {
+      "Business": {
+        "precision": 0.25,
+        "recall": 1.0,
+        "f1_score": 0.4,
+        "support": 1
+      },
+      "Sci/Tech": {
+        "precision": 1.0,
+        "recall": 0.631578947368421,
+        "f1_score": 0.7741935483870968,
+        "support": 19
+      },
+      "Sports": {
+        "precision": null,
+        "recall": null,
+        "f1_score": null,
+        "support": 0
+      },
+      "World": {
+        "precision": 0.0,
+        "recall": null,
+        "f1_score": null,
+        "support": 0
+      }
+    }
+  }
+]
